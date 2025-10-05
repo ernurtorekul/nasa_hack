@@ -89,11 +89,29 @@ async def hello_world():
     return {"message": "Hello World from WeatherSphere API"}
 
 @app.get("/cors-test")
-async def cors_test():
+async def cors_test(response: Response):
+    # Add explicit CORS headers
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return {
         "message": "CORS test endpoint",
         "cors_origins": "*",
-        "timestamp": str(os.getenv("RENDER_EXTERNAL_URL", "unknown"))
+        "timestamp": str(os.getenv("RENDER_EXTERNAL_URL", "unknown")),
+        "deploy_time": "2025-10-05-16:02:00"
+    }
+
+@app.get("/version")
+async def version_check(response: Response):
+    # Add explicit CORS headers
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return {
+        "version": "1.2.0",
+        "deploy_time": "2025-10-05-16:02:00",
+        "cors_enabled": True,
+        "message": "CORS headers fixed"
     }
 
 @app.get("/weather", response_model=WeatherResponse)
