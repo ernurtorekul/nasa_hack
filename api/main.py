@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
@@ -97,7 +97,11 @@ async def cors_test():
     }
 
 @app.get("/weather", response_model=WeatherResponse)
-async def get_weather(city: str):
+async def get_weather(city: str, response: Response):
+    # Add explicit CORS headers
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     if not OPENWEATHER_API_KEY:
         raise HTTPException(status_code=500, detail="OpenWeather API key not configured")
 
