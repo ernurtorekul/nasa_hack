@@ -19,8 +19,11 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/weather?city=${encodeURIComponent(city.trim())}`
+        `https://nasa-hack-88nz.onrender.com/weather?city=${encodeURIComponent(city.trim())}`
       );
+      // const response = await fetch(
+      //   `http://localhost:8000/weather?city=${encodeURIComponent(city.trim())}`
+      // );
 
       if (!response.ok) {
         const errorData = await response.json();
