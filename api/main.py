@@ -88,6 +88,14 @@ class AlertResponse(BaseModel):
 async def hello_world():
     return {"message": "Hello World from WeatherSphere API"}
 
+@app.get("/cors-test")
+async def cors_test():
+    return {
+        "message": "CORS test endpoint",
+        "cors_origins": "*",
+        "timestamp": str(os.getenv("RENDER_EXTERNAL_URL", "unknown"))
+    }
+
 @app.get("/weather", response_model=WeatherResponse)
 async def get_weather(city: str):
     if not OPENWEATHER_API_KEY:
