@@ -18,9 +18,14 @@ function App() {
     setWeather(null);
 
     try {
+      // Temporary CORS proxy solution - change back to direct URL once Render deploys properly
       const response = await fetch(
-        `https://nasa-hack-88nz.onrender.com/weather?city=${encodeURIComponent(city.trim())}`
+        `https://corsproxy.io/?https://nasa-hack-88nz.onrender.com/weather?city=${encodeURIComponent(city.trim())}`
       );
+      // Original URL (uncomment once Render deployment with CORS fixes is complete):
+      // const response = await fetch(
+      //   `https://nasa-hack-88nz.onrender.com/weather?city=${encodeURIComponent(city.trim())}`
+      // );
       // const response = await fetch(
       //   `http://localhost:8000/weather?city=${encodeURIComponent(city.trim())}`
       // );
