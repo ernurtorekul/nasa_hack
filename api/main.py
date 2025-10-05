@@ -16,8 +16,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",  # Frontend URL
-        "http://localhost:5174",  # Frontend URL
-        "http://localhost:5175",  # Frontend URL
+        "https://nasa-hack-88nz.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
