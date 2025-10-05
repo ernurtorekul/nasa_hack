@@ -15,9 +15,7 @@ app = FastAPI(title="WeatherSphere API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Local frontend URL
-        "https://nasa-hack-88nz.onrender.com",  # Backend itself (self-referencing)
-        "https://nasa-hack-pi.vercel.app",  # Vercel frontend URL
+        "*",  # Allow all origins for development - can be more specific later
     ],
     allow_credentials=True,
     allow_methods=["*"],
