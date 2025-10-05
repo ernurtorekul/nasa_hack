@@ -318,6 +318,41 @@ async def register_location(location: LocationRegistration):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to register location: {str(e)}")
 
+@app.get("/get_location/{chat_id}", response_model=dict)
+async def get_user_location(chat_id: int, response: Response):
+    # Add explicit CORS headers
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Supabase not configured")
+
+    try:
+        # Find the user by chat_id
+        existing_user = await supabase.select("users")
+        if existing_user.status_code == 200:
+            users = existing_user.json()
+            existing = next((u for u in users if u.get("chat_id") == chat_id), None)
+
+            if existing:
+                return {
+                    "message": f"Found location for chat_id: {chat_id}",
+                    "chat_id": chat_id,
+                    "user_id": existing["id"],
+                    "city": existing.get("city"),
+                    "latitude": existing.get("latitude"),
+                    "longitude": existing.get("longitude"),
+                    "has_location": bool(existing.get("city") or (existing.get("latitude") and existing.get("longitude")))
+                }
+            else:
+                raise HTTPException(status_code=404, detail=f"User with chat_id {chat_id} not found")
+        else:
+            raise HTTPException(status_code=500, detail="Failed to fetch users from database")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get location: {str(e)}")
+
 @app.delete("/delete_location/{chat_id}", response_model=dict)
 async def delete_user_location(chat_id: int):
     if not supabase:

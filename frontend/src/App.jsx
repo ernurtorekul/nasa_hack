@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
@@ -6,6 +6,66 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [autoFilled, setAutoFilled] = useState(false);
+
+  // Fetch user location by chat_id
+  const fetchUserLocation = async (chatId) => {
+    try {
+      // Using CORS proxy for now
+      const response = await fetch(
+        `https://corsproxy.io/?https://nasa-hack-88nz.onrender.com/get_location/${chatId}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.has_location && data.city) {
+          setCity(data.city);
+          setAutoFilled(true);
+          // Auto-fetch weather for the user's location
+          await fetchWeatherForCity(data.city);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch user location:", err);
+    }
+  };
+
+  // Fetch weather for a specific city
+  const fetchWeatherForCity = async (cityName) => {
+    if (!cityName.trim()) return;
+
+    setLoading(true);
+    setError("");
+    setWeather(null);
+
+    try {
+      const response = await fetch(
+        `https://corsproxy.io/?https://nasa-hack-88nz.onrender.com/weather?city=${encodeURIComponent(cityName.trim())}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch weather data");
+      }
+
+      const data = await response.json();
+      setWeather(data);
+    } catch (err) {
+      setError(err.message || "An error occurred while fetching weather data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Check for chat_id in URL on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatId = urlParams.get('chat_id');
+
+    if (chatId) {
+      fetchUserLocation(chatId);
+    }
+  }, []);
 
   const fetchWeather = async () => {
     if (!city.trim()) {
@@ -67,14 +127,27 @@ function App() {
             WeatherSphere
           </h1>
 
+          {autoFilled && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-700 text-center text-sm">
+                🎉 Location automatically loaded from your Telegram bot settings!
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="mb-8">
             <div className="flex gap-2">
               <input
                 type="text"
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Enter city name..."
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(e) => {
+                  setCity(e.target.value);
+                  setAutoFilled(false); // Reset auto-fill when user manually changes the city
+                }}
+                placeholder={autoFilled ? "Change location..." : "Enter city name..."}
+                className={`flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  autoFilled ? "border-green-300 bg-green-50" : "border-gray-300"
+                }`}
               />
               <button
                 type="submit"
