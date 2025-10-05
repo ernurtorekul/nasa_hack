@@ -5,11 +5,8 @@ from typing import List, Dict, Any, Optional
 import httpx
 import os
 import json
-from dotenv import load_dotenv
 
-# Vercel doesn't support .env files directly, so load from environment variables
-# load_dotenv()  # Commented out for Vercel
-
+# Vercel Python runtime requires this specific structure
 app = FastAPI(title="WeatherSphere API")
 
 # Enable CORS
@@ -322,10 +319,6 @@ async def delete_user_location(chat_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete location: {str(e)}")
 
-# For Vercel serverless deployment
-handler = app
-
-# Vercel serverless function handler
-def lambda_handler(event, context):
-    # For AWS Lambda-style serverless functions
-    return app(event, context)
+# Vercel handler
+def handler(request):
+    return app(request)
