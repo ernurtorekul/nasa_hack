@@ -175,7 +175,7 @@ async def register_user_location(chat_id: int, city: str = None, latitude: float
 
                 # Create success message with dashboard button
                 keyboard = [
-                    [InlineKeyboardButton("🌤️ Open Dashboard", url="https://example.com/dashboard")]  # Placeholder URL
+                    [InlineKeyboardButton("🌤️ Open Dashboard", url="https://nasa-hack-pi.vercel.app/")]  # Placeholder URL
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
 
